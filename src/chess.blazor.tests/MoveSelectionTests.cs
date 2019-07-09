@@ -29,6 +29,20 @@ namespace chess.blazor.tests
         }
 
         [Test]
+        public void Selection_that_does_not_contain_valid_location_is_ignored_key()
+        {
+            var availableMoves = new Move[] { };
+
+            _cellsProviderMocker.SetupGetFail();
+
+            _moveSelection.Selected("invalid-location", availableMoves, WhiteToPlay);
+            Assert.That(_moveSelection.From, Is.EqualTo(string.Empty));
+
+            _cellsProviderMocker.VerifySourceCellWasNotSet();
+            _cellsProviderMocker.VerifyDestinationCellsWereNotSet();
+        }
+
+        [Test]
         public void Valid_selection_sets_From_and_highlights_From_and_To_destinations()
         {
             var availableMoves = new Move[] { };
@@ -39,20 +53,6 @@ namespace chess.blazor.tests
 
             _cellsProviderMocker.VerifySourceCellIsSet(ALocation);
             _cellsProviderMocker.VerifySomeDestinationCellsWereSet();
-        }
-
-        [Test]
-        public void Selection_that_does_not_contain_valid_location_is_ignored_key()
-        {
-            var availableMoves = new Move[] {};
-
-            _cellsProviderMocker.SetupGetFail();
-
-            _moveSelection.Selected("invalid-location", availableMoves, WhiteToPlay);
-            Assert.That(_moveSelection.From, Is.EqualTo(string.Empty));
-
-            _cellsProviderMocker.VerifySourceCellWasNotSet();
-            _cellsProviderMocker.VerifyDestinationCellsWereNotSet();
         }
 
         [Test]

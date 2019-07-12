@@ -1,6 +1,6 @@
 ﻿@inherits BlazorChessComponent
-@page "/blazorchess/{boardstring}"
-@page "/boardtest"
+@page "/blazorchess"
+@page "/customboard/{boardstring}"
     <div class="debug-settings">
         White is human<input type="checkbox" id="WhiteIsHuman" checked="@WhiteIsHuman"
                              onchange=@(eventArgs => { WhiteIsHuman = !WhiteIsHuman; })/> | 

@@ -9,6 +9,7 @@ namespace chess.blazor.Pages
 {
     public class BlazorChessComponent : ComponentBase
     {
+        [Parameter] public string BoardString { get; set; }
         [Parameter] public bool WhiteIsHuman { get; set; } = true;
         [Parameter] public bool BlackIsHuman { get; set; } = false;
 
@@ -26,9 +27,13 @@ namespace chess.blazor.Pages
 
         public async Task ResetBoardAsync()
         {
-            if (_firstResult == null)
+            if (string.IsNullOrEmpty(BoardString))
             {
                 _firstResult = await ApiClient.ChessGameAsync();
+            } 
+            {
+                // NOTE: Blazor default routing gets confused by using '.' in the url and I couldn't work out how to sort it so.
+                _firstResult = await ApiClient.ChessGameAsync(BoardString.Replace("_","."));
             }
 
             _lastResult = _firstResult ?? throw new NullReferenceException("Unable to initialise board");

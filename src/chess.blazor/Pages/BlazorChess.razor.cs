@@ -30,7 +30,7 @@ namespace chess.blazor.Pages
             if (string.IsNullOrEmpty(BoardString))
             {
                 _firstResult = await ApiClient.ChessGameAsync();
-            } 
+            } else
             {
                 // NOTE: Blazor default routing gets confused by using '.' in the url and I couldn't work out how to sort it so.
                 _firstResult = await ApiClient.ChessGameAsync(BoardString.Replace("_","."));

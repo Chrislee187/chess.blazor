@@ -119,7 +119,7 @@ namespace chess.blazor.Pages
         private void Status(string text)
         {
             // TODO: Move this to something on the page
-            Console.WriteLine(text);
+//            Console.WriteLine(text);
         }
     }
 }

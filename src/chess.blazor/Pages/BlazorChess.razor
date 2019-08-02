@@ -1,6 +1,14 @@
 ﻿@inherits BlazorChessComponent
 @page "/blazorchess"
 @page "/customboard/{boardstring}"
+<div class="intro">
+    This (WIP) test app is running a C# chess engine inside the browser using WebAssembly and Blazor preview 7.<br/>
+
+    C# can be debugged in the browser by closing on chrome instances and restarting with:
+                                                                                                               <pre>& "C:\Program Files (x86)\Google\Chrome\Application\chrome.exe" --remote-debugging-port=9222 http://localhost:52192 </pre>
+    and then hitting
+    <pre>CTRL+SHFT+D</pre>
+</div>
     <div class="debug-settings">
         White is human<input type="checkbox" id="WhiteIsHuman" checked="@WhiteIsHuman"
                              onchange=@(eventArgs => { WhiteIsHuman = !WhiteIsHuman; })/> | 
@@ -15,4 +23,4 @@
                     OnMoveSelectedAsync="@OnMoveSelectedAsync"
                     ></AvailableMoveList>
     </div>
-<button onclick="@(async () => await ResetBoardAsync())">Reset Board</button>
+<button onclick="@(() => ResetBoardAsync())">Reset Board</button>

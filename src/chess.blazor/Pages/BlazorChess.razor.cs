@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Linq;
 using System.Threading.Tasks;
+using board.engine;
 using chess.blazor.Shared.Chess;
 using chess.webapi.client.csharp;
 using Microsoft.AspNetCore.Components;
@@ -13,8 +14,8 @@ namespace chess.blazor.Pages
         [Parameter] public bool WhiteIsHuman { get; set; } = true;
         [Parameter] public bool BlackIsHuman { get; set; } = false;
 
-        protected ChessBoardComponent ChessBoard { get; set; }
-        protected AvailableMoveListComponent MoveList { get; set; }
+        public ChessBoardComponent ChessBoard { get; set; }
+        public AvailableMoveListComponent MoveList { get; set; }
         [Inject] public IChessGameApiClient ApiClient { get; set; }
 
         private ChessWebApiResult _firstResult;
@@ -23,32 +24,50 @@ namespace chess.blazor.Pages
         private int _moveCount;
         private static readonly Random Random = new Random();
 
-        protected override async Task OnInitAsync() => await ResetBoardAsync();
+        protected override async Task OnInitAsync()
+        {
+            await ResetBoardAsync();
+        }
 
-        public async Task ResetBoardAsync()
+        public async Task InitialiseState()
         {
             if (string.IsNullOrEmpty(BoardString))
             {
-                _firstResult = await ApiClient.ChessGameAsync();
-            } else
+                _lastResult = await ApiClient.ChessGameAsync();
+            }
+            else
             {
                 // NOTE: Blazor default routing gets confused by using '.' in the url and I couldn't work out how to fix it so...
-                _firstResult = await ApiClient.ChessGameAsync(BoardString.Replace("_","."));
+                _lastResult = await ApiClient.ChessGameAsync(BoardString.Replace("_", "."));
             }
 
-            _lastResult = _firstResult ?? throw new NullReferenceException("Unable to initialise board");
+            if (_firstResult == null) _firstResult = _lastResult;
 
-            UpdateBoardAndMoves(_firstResult);
+            Guard.NotNull(_lastResult, "Unable to initialise board");
+
             _moveCount = 0;
         }
-
-        private void UpdateBoardAndMoves(ChessWebApiResult result)
+        public async Task ResetBoardAsync()
         {
-            UpdateChessBoardComponent(result);
 
-            UpdateMoveListComponent(result);
+            if (_firstResult == null)
+            {
+                await InitialiseState();
+            }
+            else
+            {
+                _lastResult = _firstResult;
+            }
 
-            Status("Triggering state change");
+            UpdateBoardAndMoves();
+        }
+
+        private void UpdateBoardAndMoves()
+        {
+
+            UpdateChessBoardComponent(_lastResult);
+
+            UpdateMoveListComponent(_lastResult);
         }
 
         private void UpdateMoveListComponent(ChessWebApiResult result)
@@ -63,7 +82,6 @@ namespace chess.blazor.Pages
 
         private void UpdateChessBoardComponent(ChessWebApiResult result)
         {
-            Status("Updating board...");
             ChessBoard.Update(result.Board, result.AvailableMoves, result.WhoseTurn.ToLower().Contains("white"));
         }
 
@@ -76,7 +94,7 @@ namespace chess.blazor.Pages
                 // TODO: Temp hack to stop endless auto-games, need proper stalement & not-enough-material-left checks
                 if (_moveCount > 150) throw new Exception("Move limit exceeded");
                 _lastResult = await ApiClient.PlayMoveAsync(ChessBoard.Board, EncodeMove(move));
-                UpdateBoardAndMoves(_lastResult);
+                UpdateBoardAndMoves();
                 StateHasChanged();  // NOTE: We call StateHasChanged() because we are in a recursive method when handling AI players and therefore the state doesn't automatically get updated until the stack unwinds
                 _moveCount++;
                 if(!_lastResult.Message.ToLower().Contains("checkmate"))
@@ -115,11 +133,5 @@ namespace chess.blazor.Pages
         }
 
         public string EncodeMove(string move) => move.Replace("+", ""); // NOTE: '+' breaks the urls!, it's only cosmetic so just remove it
-
-        private void Status(string text)
-        {
-            // TODO: Move this to something on the page
-//            Console.WriteLine(text);
-        }
     }
 }

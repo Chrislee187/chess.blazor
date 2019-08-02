@@ -7,13 +7,21 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="chess.engine" Version="1.1.0" />
     <PackageReference Include="chess.webapi.client.csharp" Version="1.0.1" />
     <PackageReference Include="Microsoft.AspNetCore.Blazor" Version="3.0.0-preview7.19365.7" />
     <PackageReference Include="Microsoft.AspNetCore.Blazor.Build" Version="3.0.0-preview7.19365.7" PrivateAssets="all" />
     <PackageReference Include="Microsoft.AspNetCore.Blazor.DevServer" Version="3.0.0-preview7.19365.7" PrivateAssets="all" />
     <PackageReference Include="Microsoft.Extensions.Logging" Version="3.0.0-preview7.19362.4" />
     <PackageReference Include="pgn-reader" Version="1.0.1" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Reference Include="board.engine">
+      <HintPath>..\..\..\chess.engine\src\chess.engine\bin\Debug\netstandard2.0\board.engine.dll</HintPath>
+    </Reference>
+    <Reference Include="chess.engine">
+      <HintPath>..\..\..\chess.engine\src\chess.engine\bin\Debug\netstandard2.0\chess.engine.dll</HintPath>
+    </Reference>
   </ItemGroup>
 
 </Project>
